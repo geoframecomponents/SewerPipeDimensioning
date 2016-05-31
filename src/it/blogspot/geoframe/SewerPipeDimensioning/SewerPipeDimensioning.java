@@ -1,13 +1,18 @@
+package it.blogspot.geoframe.SewerPipeDimensioning;
+
 public class SewerPipeDimensioning {
 
-	/** Definition of specific weight of water */
+	/** Definition of specific weight of water [N/m^3] */
 	private static final double WSPECIFICWEIGHT = 9800;
 
-	private static final double y1 = 10.76;
+	/** Definition of first node terrain elevation */
+	private static final double startElevation = 7.76;
 
-	private static final double y2 = 4.65;
+	/** Definition of second node terrain elevation */
+	private static final double endElevation = 4.65;
 
-	private static final double L = 10.0;
+	/** Definition of pipe horizontal lenght */
+	private static final double pipeLenght = 10.0;
 
 	private static boolean flag = false;
 	
@@ -21,10 +26,10 @@ public class SewerPipeDimensioning {
 	public static double tau = 2.0;
 	
 	/** Definition of discharge [l/s] */
-	public static double Q = 5.0;
+	public static double Q = 2.0;
 	
 	/** Definition of Gaucker-Strickler coefficient */
-	public static double Ks = 0.003;
+	public static double Ks = 0.03;
 	
 	/** Definition of hydraulic radius */
 	public static double Rh;
@@ -64,7 +69,7 @@ public class SewerPipeDimensioning {
 	private double naturalSlope(double y1, double y2, double lenght) {
 		return (y1-y2)/lenght;
 	}
-	
+
 	/** Evaluation of minimum slope */
 	private double minSlope() {
 		double theta = getTheta(G);
@@ -103,8 +108,11 @@ public class SewerPipeDimensioning {
 		if (flag == false) {
 			System.out.println(slope);
 	    	 D = test.getDiameter(slope);
-	     }
-		System.out.println(D);
+	     } 
+		System.out.println(slope);
+		System.out.println(G);
+		System.out.println(test.getTheta(slope));
+		System.out.println(D*100);
 		// System.out.println(test.getSlope(tau, Rh));
 	}
 	
