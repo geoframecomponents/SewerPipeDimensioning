@@ -1,0 +1,3 @@
+[submodule "lib/GEOframeUtils"]
+	path = lib/GEOframeUtils
+	url = git@github.com:geoframecomponents/GEOframeUtils.git
