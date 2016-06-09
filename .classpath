@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="lib/GEOframeUtils"/>
 	<classpathentry kind="src" path="lib/HydroGeoEntities"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/gt-graph-14.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
