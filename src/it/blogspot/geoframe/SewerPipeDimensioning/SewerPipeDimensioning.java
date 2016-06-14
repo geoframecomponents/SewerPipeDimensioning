@@ -23,42 +23,44 @@ import it.blogspot.geoframe.utils.GEOgeometry;
 import it.blogspot.geoframe.hydroGeoEntities.line.*;
 
 /**
-*
-*
-* @author ftt01, dallatorre.daniele@gmail.com
-* @version 0.1
-* @date June 13, 2016
-* @copyright GNU Public License v3 GWH-2b4
-*/
-
+ *
+ *
+ * @author ftt01, dallatorre.daniele@gmail.com
+ * @author
+ * @version 0.1
+ * @date June 13, 2016
+ * @copyright GNU Public License v3 GWH-2b4
+ */
 public class SewerPipeDimensioning {
 	
-    private static double gaucklerStricklerCoefficient;
-    private static double fillCoefficient;
-    private double fillAngle;
-    private static double discharge;
-    private double hydraulicRadius;
-    private double minSlope;
-    private double pipeSlope;
-    private double diameter;
+	private static double gaucklerStricklerCoefficient;
+	private static double fillCoefficient;
+	private double fillAngle;
+	private static double discharge;
+	private double hydraulicRadius;
+	private double minSlope;
+	private double pipeSlope;
+	private double diameter;
+	private double elevationEndPoint;
 
-    private Pipe pipe;
+	private Pipe pipe;
 
-    public SewerPipeDimensioning(final Pipe pipe) {
-    	this.pipe = pipe;
+	public SewerPipeDimensioning(final Pipe pipe) {
+		this.pipe = pipe;
 		setFields();
+		setFirstAttemptValues();
 	}
 
 	private void setFields() {
 		gaucklerStricklerCoefficient = pipe.getGaucklerStricklerCoefficient();
 		fillCoefficient = pipe.getFillCoefficient();
 		discharge = pipe.getDischarge();
+	}
 
+	private void setFirstAttemptValues() {
 		fillAngle = computeFillAngle();
-
-		pipe.setElevationEndPoint(pipe.getEndPoint().getTerrainElevation()-GEOconstants.MINIMUMEXCAVATION);
+		elevationEndPoint = pipe.getEndPoint().getTerrainElevation()-GEOconstants.MINIMUMEXCAVATION;
 		pipeSlope = computePipeSlope();
-		
 		minSlope = computeMinSlope();
 	}
 
@@ -83,7 +85,7 @@ public class SewerPipeDimensioning {
 	 */
 	private double computeFixedDiameter(double fillAngle) {
 		final double pow1 = 13.0/6;
-		double numerator =  Math.pow(4, pow1);
+		double numerator =	Math.pow(4, pow1);
 		final double pow2 = 7.0/6;
 		double denominator = fillAngle*Math.pow(1-Math.sin(fillAngle)/fillAngle, pow2)*gaucklerStricklerCoefficient*
 								Math.pow(GEOconstants.SHEARSTRESS/GEOconstants.WSPECIFICWEIGHT, 0.5);
@@ -104,7 +106,7 @@ public class SewerPipeDimensioning {
 	 */
 	private double computePipeSlope() {
 		return GEOgeometry.computeSlope(pipe.getStartPoint().getX(), pipe.getStartPoint().getY(), pipe.getStartPoint().getElevation(),
-										pipe.getEndPoint().getX(), pipe.getEndPoint().getY(), pipe.getEndPoint().getElevation());
+										pipe.getEndPoint().getX(), pipe.getEndPoint().getY(), elevationEndPoint);
 	}
 
 	/**
@@ -140,7 +142,7 @@ public class SewerPipeDimensioning {
 	
 	public Pipe run() {
 		if (pipeSlope>=minSlope) {
-			pipe.buildPipe(pipe.getEndPoint().getElevation(), computeDiameter(pipeSlope), fillCoefficient, computeVelocity());
+			pipe.buildPipe(elevationEndPoint, computeDiameter(pipeSlope), fillCoefficient, computeVelocity());
 		} else {
 			pipe.buildPipe(computeElevationEndPoint(minSlope), diameter, fillCoefficient, computeVelocity());
 		}
