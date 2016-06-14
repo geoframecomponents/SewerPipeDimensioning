@@ -40,7 +40,7 @@ public class SewerPipeDimensioning {
     private double hydraulicRadius;
     private double minSlope;
     private double pipeSlope;
-    public double diameter;
+    private double diameter;
 
     private Pipe pipe;
 
@@ -68,14 +68,7 @@ public class SewerPipeDimensioning {
 	private double computeFillAngle() {
 		return 2*Math.acos(1-2*fillCoefficient);
 	}
-	
-	/**
-	 * Evaluation of Rh (hydraulic radius) from Rh=D/4*(1-sin(theta)/theta)
-	 */
-	private double computeHydraulicRadius(double fillAngle) {
-		return diameter/4*(1-Math.sin(fillAngle)/fillAngle);
-	}
-	
+
 	/** 
 	 * Evaluation of slope due to fixed shear stress from slope=tau/(WSPECIFICWEIGHT*Rh)
 	 */
@@ -97,6 +90,13 @@ public class SewerPipeDimensioning {
 		final double pow3 = 6.0/13;
 
 		return Math.pow(numerator/denominator, pow3);
+	}
+
+	/**
+	 * Evaluation of Rh (hydraulic radius) from Rh=D/4*(1-sin(theta)/theta)
+	 */
+	private double computeHydraulicRadius(double fillAngle) {
+		return diameter/4*(1-Math.sin(fillAngle)/fillAngle);
 	}
 
 	/**
