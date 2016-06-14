@@ -145,11 +145,11 @@ public class SewerPipeDimensioning {
 	public Pipe run(final Pipe pipe) {
 		setPipe(pipe);
 		if (pipeSlope>=minSlope) {
-			pipe.buildPipe(elevationEndPoint, computeDiameter(pipeSlope), fillCoefficient, computeVelocity());
+			this.pipe.buildPipe(elevationEndPoint, computeDiameter(pipeSlope), fillCoefficient, computeVelocity());
 		} else {
-			pipe.buildPipe(computeElevationEndPoint(minSlope), diameter, fillCoefficient, computeVelocity());
+			this.pipe.buildPipe(computeElevationEndPoint(minSlope), diameter, fillCoefficient, computeVelocity());
 		}
 
-		return pipe;
+		return this.pipe;
 	}
 }
