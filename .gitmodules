@@ -1,6 +1,0 @@
-[submodule "mod/GEOframeUtils"]
-	path = mod/GEOframeUtils
-	url = git@github.com:geoframecomponents/GEOframeUtils
-[submodule "mod/HydroGeoEntities"]
-	path = mod/HydroGeoEntities
-	url = git@github.com:geoframecomponents/HydroGeoEntities.git
