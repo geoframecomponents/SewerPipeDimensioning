@@ -32,7 +32,7 @@ import it.blogspot.geoframe.hydroGeoEntities.line.*;
  * @copyright GNU Public License v3 GWH-2b4
  */
 public class SewerPipeDimensioning {
-	
+
 	private static double gaucklerStricklerCoefficient;
 	private static double fillCoefficient;
 	private double fillAngle;
@@ -45,7 +45,9 @@ public class SewerPipeDimensioning {
 
 	private Pipe pipe;
 
-	public SewerPipeDimensioning(final Pipe pipe) {
+	public SewerPipeDimensioning() {}
+
+	private void setPipe(final Pipe pipe) {
 		this.pipe = pipe;
 		setFields();
 		setFirstAttemptValues();
@@ -140,7 +142,8 @@ public class SewerPipeDimensioning {
 		return numerator/denominator;
 	}
 	
-	public Pipe run() {
+	public Pipe run(final Pipe pipe) {
+		setPipe(pipe);
 		if (pipeSlope>=minSlope) {
 			pipe.buildPipe(elevationEndPoint, computeDiameter(pipeSlope), fillCoefficient, computeVelocity());
 		} else {
