@@ -202,7 +202,7 @@ public class SewerPipeDimensioning {
 	 */
 	private double computeVelocity() {
 		double numerator = discharge * 8;
-		double denominator = diameter * (fillAngle - Math.sin(fillAngle));
+		double denominator = diameter * diameter * (fillAngle - Math.sin(fillAngle));
 		return numerator / denominator;
 	}
 
