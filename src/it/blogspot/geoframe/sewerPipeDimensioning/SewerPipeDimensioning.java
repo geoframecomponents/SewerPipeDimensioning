@@ -23,10 +23,43 @@ import it.blogspot.geoframe.utils.GEOgeometry;
 import it.blogspot.geoframe.hydroGeoEntities.line.*;
 
 /**
- * @brief Computation of sewer pipe dimension.
+ * @mainpage On-line Documentation
  * 
- * @description This class compute the pipe diameter of a sewer with the respect
- *              of minimum slope and minimum excavation.
+ * @section Description Description 
+ * 			This component compute the pipe diameter of
+ *          a sewer with the respect of minimum slope and minimum excavation.
+ *          The class take as input a <strong>Pipe</strong> object and, after
+ *          the computation, return an object of the same type with some values
+ *          changed and some evaluated.
+ * 
+ * @subsection Units Units
+ * 			   The units used in the component are
+ *             <ul>
+ *             <li>discharge \f$[l/s]\f$
+ *             <li>diameter \f$[m]\f$
+ *             <li>fill angle \f$[rad]\f$
+ *             <li>hydraulic radius \f$[m]\f$
+ *             <li>slope \f$[-]\f$
+ *             <li>Gauckler Strickler \f$[\frac{m^{1/3}}{s}]\f$
+ *             </ul>
+ * 
+ * @section Implementation Implementation
+ *          <ol>
+ *          <li>The component evaluate a minimum slope due to shear stress fixed
+ *          in prior to guarantee the auto-cleaning at the base of the channel.
+ *          In the evaluation of minimum slope is fixed a diameter obtained
+ *          using the shear stress given
+ * 
+ *          <li>After the component evaluate the slope of the pipe with the
+ *          hypothesis that the end point elevation is equal to the minimum
+ *          excavation given.
+ * 
+ *          <li>With a compare is evaluated if the slope computed in the last
+ *          step is greater of the minimum. If this check is true the component
+ *          compute the diameter with the slope due to set elevation end point.
+ *          Else set the diameter equal to the diameter evaluated at the first
+ *          step.
+ *          </ol>
  * 
  * @author ftt01, dallatorre.daniele@gmail.com
  * @author
@@ -57,12 +90,11 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Setter of the class fields.
 	 *
-	 * @description This method set the fields of the class and the parameters
-	 *              of the local <strong>pipe</strong> object calling
-	 *              <strong>setFields</strong> method. Furthermore it sets first
-	 *              attempt values calling
-	 *              <strong>setFirstAttemptValues</strong> method evaluating the
-	 *              remaining field values.
+	 *        This method set the fields of the class and the parameters of the
+	 *        local <strong>pipe</strong> object calling
+	 *        <strong>setFields</strong> method. Furthermore it sets first
+	 *        attempt values calling <strong>setFirstAttemptValues</strong>
+	 *        method evaluating the remaining field values.
 	 * 
 	 * @param[in] pipe <strong>Pipe</strong> object that contains all the
 	 *            necessary information about the considered HydroGeoEntity.
@@ -96,10 +128,10 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Computation of <strong>fillAngle</strong>.
 	 * 
-	 * @description Computation of <strong>fillAngle</strong> from \f[
-	 *              G=\frac{1-cos(\theta/2)}{2} \f] where \f$ G \f$ is the fill
-	 *              coefficient, \f$ \theta \f$ is the fill angle related to the
-	 *              fill coefficient.
+	 *        Computation of <strong>fillAngle</strong> from \f[
+	 *        G=\frac{1-cos(\theta/2)}{2} \f] where \f$ G \f$ is the fill
+	 *        coefficient, \f$ \theta \f$ is the fill angle related to the fill
+	 *        coefficient.
 	 */
 	private double computeFillAngle() {
 		return 2 * Math.acos(1 - 2 * fillCoefficient);
@@ -108,11 +140,10 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Computation of minimum slope.
 	 * 
-	 * @description Evaluation of minimum slope due to fixed shear stress at the
-	 *              base of the pipe with the relation \f[
-	 *              i_{min}=\frac{\tau}{\gamma*R_h} \f] where the \f$\tau\f$ is
-	 *              the shear stress, \f$\gamma\f$ is the specific weight of
-	 *              water and \f$R_h\f$ the hydraulic radius.
+	 *        Evaluation of minimum slope due to fixed shear stress at the base
+	 *        of the pipe with the relation \f[ i_{min}=\frac{\tau}{\gamma*R_h}
+	 *        \f] where the \f$\tau\f$ is the shear stress, \f$\gamma\f$ is the
+	 *        specific weight of water and \f$R_h\f$ the hydraulic radius.
 	 * 
 	 * @todo Build a method to use commercial pipe dimensions.
 	 */
@@ -127,10 +158,10 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Computation of diameter due to auto-cleaning.
 	 * 
-	 * @description The diameter is related to minimum slope and is evaluated by
-	 *              the relation \f[ D = {\left[ \frac{4^{^{13}/_6} Q}{\theta
-	 *              {(1-\frac{sin(\theta)}{\theta})}^{^7/_6} K_s
-	 *              \sqrt{^\tau/_\gamma}} \right]}^{^6/_{13}} \f]
+	 *        The diameter is related to minimum slope and is evaluated by the
+	 *        relation \f[ D = {\left[ \frac{4^{^{13}/_6} Q}{\theta
+	 *        {(1-\frac{sin(\theta)}{\theta})}^{^7/_6} K_s \sqrt{^\tau/_\gamma}}
+	 *        \right]}^{^6/_{13}} \f]
 	 */
 	private double computeFixedDiameter(double fillAngle) {
 		final double pow1 = 13.0 / 6;
@@ -149,9 +180,9 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Computation of the hydraulic radius.
 	 * 
-	 * @description Computation of the hydraulic radius from \f[ R_h =
-	 *              D\frac{1-sin(\theta)/\theta)}{4} \f] where the \f$ \theta
-	 *              \f$ is the fill angle.
+	 *        Computation of the hydraulic radius from \f[ R_h =
+	 *        D\frac{1-sin(\theta)/\theta)}{4} \f] where the \f$ \theta \f$ is
+	 *        the fill angle.
 	 */
 	private double computeHydraulicRadius(double fillAngle) {
 		return diameter / 4 * (1 - Math.sin(fillAngle) / fillAngle);
@@ -160,8 +191,8 @@ public class SewerPipeDimensioning {
 	/**
 	 * @brief Computation of <strong>pipeSlope</strong>
 	 * 
-	 * @description Evaluation of the slope of the pipe with the end elevation
-	 *              point set by class field <strong>elevationEndPoint</strong>.
+	 *        Evaluation of the slope of the pipe with the end elevation point
+	 *        set by class field <strong>elevationEndPoint</strong>.
 	 */
 	private double computePipeSlope() {
 		return GEOgeometry.computeSlope(pipe.getStartPoint().getX(), pipe
@@ -172,6 +203,20 @@ public class SewerPipeDimensioning {
 
 	/**
 	 * @brief Evaluation of diameter related to fixed slope.
+	 *
+	 *        Computation of the diameter of a pipe with a slope assigned in
+	 *        input through the relation \f[ D = \frac{ \Big({ \frac{ \theta\,Q
+	 *        }{ K_s\,\sqrt{i_f} } \Big)}^{^3/_8} }{ {\Big(
+	 *        1-\frac{sin(\theta)}{\theta} \Big)}^{^5/_8} }\,10^{-^9/_8} \f]
+	 *        where \f$ Q \f$ is the discharge, \f$ \theta \f$ the fill angle,
+	 *        \f$ K_s \f$ the Gauckler Strickler coefficient and \f$ i_f \f$ the
+	 *        fixed slope. The factor \f$ 10^{-^9/_8} \f$ is a unit transform
+	 *        coefficient. The value returned is in meters.
+	 * 
+	 * @todo Check on the shear stress minimum.
+	 *
+	 * @param[in] slope Slope of the pipe to compute the relative diameter fixed
+	 *            the class fields.
 	 */
 	private double computeDiameter(double slope) {
 		double fillAngle = computeFillAngle();
@@ -187,7 +232,13 @@ public class SewerPipeDimensioning {
 	}
 
 	/**
-	 * Evaluation of elevation of end point due to a defined slope
+	 * @brief Evaluation of elevation of end point due to a defined slope.
+	 *
+	 *        Computation of the elevation of the end point through the Pitagora
+	 *        formula and use of <strong>GEOgeometry</strong> tool.
+	 *
+	 * @param [in] slope The slope of the pipe for that is necessary to evaluate
+	 *        the end point elevation.
 	 */
 	private double computeElevationEndPoint(double slope) {
 		return pipe.getStartPoint().getElevation()
@@ -198,14 +249,33 @@ public class SewerPipeDimensioning {
 	}
 
 	/**
-	 * Evaluation of velocity
+	 * @brief Evaluation of velocity.
+	 *
+	 *        Computation of the velocity of the water in the channel through
+	 *        the relation \f[ v = \frac{8\,Q}{D^2\,(\theta - sin(\theta))} \f]
+	 *        where \f$ D \f$ is the diameter, \f$ Q \f$ the discharge and \f$
+	 *        \theta \f$ the fill angle in the channel.
 	 */
 	private double computeVelocity() {
 		double numerator = discharge * 8;
-		double denominator = diameter * diameter * (fillAngle - Math.sin(fillAngle));
+		double denominator = diameter * diameter
+				* (fillAngle - Math.sin(fillAngle));
 		return numerator / denominator;
 	}
 
+	/**
+	 * @brief Main function of the class.
+	 *
+	 *        Call <strong>setPipe</strong> to setting all the fields and
+	 *        implement the minimum slope check. Then it return the
+	 *        <strong>pipe</strong> object with new value of diameter, end point
+	 *        elevation and velocity.
+	 * 
+	 * @param [in] pipe Object passed to the class necessary to fill all the
+	 *        fields.
+	 * @param [out] pipe Object passed to the class necessary to return all the
+	 *        evaluated fields of the entity.
+	 */
 	public Pipe run(final Pipe pipe) {
 		setPipe(pipe);
 		if (pipeSlope >= minSlope) {
