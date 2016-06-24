@@ -83,9 +83,9 @@ Description</h1>
 <p>This component compute the pipe diameter of a sewer with the respect of minimum slope and minimum excavation. The class take as input a <b>Pipe</b> object and, after the computation, return an object of the same type with some values changed and some evaluated.</p>
 <h2><a class="anchor" id="Units"></a>
 Units</h2>
-<p>The units used in the component are </p><ul>
+<p>The units used in the component are: </p><ul>
 <li>
-discharge <img class="formulaInl" alt="$[l/s]$" src="form_21.png"/> </li>
+discharge <img class="formulaInl" alt="$[l/s]$" src="form_0.png"/> </li>
 <li>
 diameter <img class="formulaInl" alt="$[m]$" src="form_1.png"/> </li>
 <li>
@@ -95,21 +95,39 @@ hydraulic radius <img class="formulaInl" alt="$[m]$" src="form_1.png"/> </li>
 <li>
 slope <img class="formulaInl" alt="$[-]$" src="form_3.png"/> </li>
 <li>
-Gauckler Strickler <img class="formulaInl" alt="$[\frac{m^{1/3}}{s}]$" src="form_22.png"/> </li>
+Gauckler Strickler <img class="formulaInl" alt="$[\frac{m^{1/3}}{s}]$" src="form_4.png"/> </li>
 </ul>
 <h1><a class="anchor" id="Implementation"></a>
 Implementation</h1>
 <ol>
 <li>
-<p class="startli">The component evaluate a minimum slope due to shear stress fixed in prior to guarantee the auto-cleaning at the base of the channel. In the evaluation of minimum slope is fixed a diameter obtained using the shear stress given</p>
+<p class="startli">The component evaluate the first attempt values of diameter and minimum slope due to shear stress fixed in prior to guarantee the auto-cleaning at the base of the pipe.</p>
 <p class="endli"></p>
 </li>
 <li>
-<p class="startli">After the component evaluate the slope of the pipe with the hypothesis that the end point elevation is equal to the minimum excavation given.</p>
+<p class="startli">It evaluate the slope of the pipe with the hypothesis that the end point elevation is equal to the minimum excavation given.</p>
 <p class="endli"></p>
 </li>
 <li>
-With a compare is evaluated if the slope computed in the last step is greater of the minimum. If this check is true the component compute the diameter with the slope due to set elevation end point. Else set the diameter equal to the diameter evaluated at the first step. </li>
+<p class="startli">With a comparison is evaluated if the slope computed in the last step is greater of the minimum.</p>
+<ol type="A">
+<li>
+<p class="startli">If this check is true the component compute the diameter with the slope due to set elevation end point and the minimum slope with that diameter. </p><ol type="a">
+<li>
+<p class="startli">If the slope of the pipe with this diameter in greater than the minimum the method returns the pipe object filled with minimum excavation, diameter and related velocity.</p>
+<p class="endli"></p>
+</li>
+<li>
+If this check fail, so the slope should be equal to the minimum the method returns a pipe object with a new evaluated end elevation point, same diameter and related velocity. </li>
+</ol>
+<p class="endli"></p>
+</li>
+<li>
+<p class="startli">Else set the diameter equal to the diameter evaluated at the first step.</p>
+<p class="endli"></p>
+</li>
+</ol>
+</li>
 </ol>
 <dl class="section author"><dt>Author</dt><dd>ftt01, <a href="#" onclick="location.href='mai'+'lto:'+'dal'+'la'+'tor'+'re'+'.da'+'ni'+'ele'+'@g'+'mai'+'l.'+'com'; return false;">dalla<span style="display: none;">.nosp@m.</span>torr<span style="display: none;">.nosp@m.</span>e.dan<span style="display: none;">.nosp@m.</span>iele<span style="display: none;">.nosp@m.</span>@gmai<span style="display: none;">.nosp@m.</span>l.co<span style="display: none;">.nosp@m.</span>m</a> </dd>
 <dd>
