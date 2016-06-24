@@ -25,7 +25,7 @@ import it.blogspot.geoframe.hydroGeoEntities.line.*;
 /**
  * @mainpage On-line Documentation
  * 
- * @section Description Description 
+ * @section Description Description
  * 			This component compute the pipe diameter of
  *          a sewer with the respect of minimum slope and minimum excavation.
  *          The class take as input a <strong>Pipe</strong> object and, after
@@ -33,7 +33,7 @@ import it.blogspot.geoframe.hydroGeoEntities.line.*;
  *          changed and some evaluated.
  * 
  * @subsection Units Units
- * 			   The units used in the component are
+ * 			   The units used in the component are:
  *             <ul>
  *             <li>discharge \f$[l/s]\f$
  *             <li>diameter \f$[m]\f$
@@ -45,20 +45,34 @@ import it.blogspot.geoframe.hydroGeoEntities.line.*;
  * 
  * @section Implementation Implementation
  *          <ol>
- *          <li>The component evaluate a minimum slope due to shear stress fixed
- *          in prior to guarantee the auto-cleaning at the base of the channel.
- *          In the evaluation of minimum slope is fixed a diameter obtained
- *          using the shear stress given
+ *          <li>The component evaluate the first attempt values of diameter and
+ *          minimum slope due to shear stress fixed in prior to guarantee the
+ *          auto-cleaning at the base of the pipe.
  * 
- *          <li>After the component evaluate the slope of the pipe with the
- *          hypothesis that the end point elevation is equal to the minimum
- *          excavation given.
+ *          <li>It evaluate the slope of the pipe with the hypothesis that the
+ *          end point elevation is equal to the minimum excavation given.
  * 
- *          <li>With a compare is evaluated if the slope computed in the last
- *          step is greater of the minimum. If this check is true the component
- *          compute the diameter with the slope due to set elevation end point.
- *          Else set the diameter equal to the diameter evaluated at the first
- *          step.
+ *          <li>With a comparison is evaluated if the slope computed in the last
+ *          step is greater of the minimum.
+ * 
+ *          <ol type="A">
+ *          <li>If this check is true the component compute the diameter with
+ *          the slope due to set elevation end point and the minimum slope with
+ *          that diameter.
+ *          <ol type="a">
+ *          <li>If the slope of the pipe with this diameter in greater than the
+ *          minimum the method returns the pipe object filled with minimum
+ *          excavation, diameter and related velocity.
+ * 
+ *          <li>If this check fail, so the slope should be equal to the minimum
+ *          the method returns a pipe object with a new evaluated end elevation
+ *          point, same diameter and related velocity.
+ *          </ol>
+ * 
+ *          <li>Else set the diameter equal to the diameter evaluated at the
+ *          first step.
+ * 
+ *          </ol>
  *          </ol>
  * 
  * @author ftt01, dallatorre.daniele@gmail.com
@@ -71,12 +85,11 @@ public class SewerPipeDimensioning {
 
 	private static double gaucklerStricklerCoefficient;
 	private static double fillCoefficient;
-	private double fillAngle;
+	private static double fillAngle;
 	private static double discharge;
-	private double hydraulicRadius;
+	private double diameter;
 	private double minSlope;
 	private double pipeSlope;
-	private double diameter;
 	private double elevationEndPoint;
 
 	private Pipe pipe;
@@ -122,6 +135,7 @@ public class SewerPipeDimensioning {
 		elevationEndPoint = pipe.getEndPoint().getTerrainElevation()
 				- GEOconstants.MINIMUMEXCAVATION;
 		pipeSlope = computePipeSlope();
+		diameter = computeFixedDiameter();
 		minSlope = computeMinSlope();
 	}
 
@@ -148,8 +162,7 @@ public class SewerPipeDimensioning {
 	 * @todo Build a method to use commercial pipe dimensions.
 	 */
 	private double computeMinSlope() {
-		diameter = computeFixedDiameter(fillAngle);
-		hydraulicRadius = computeHydraulicRadius(fillAngle);
+		double hydraulicRadius = computeHydraulicRadius(diameter);
 
 		return GEOconstants.SHEARSTRESS
 				/ (GEOconstants.WSPECIFICWEIGHT * hydraulicRadius);
@@ -163,7 +176,7 @@ public class SewerPipeDimensioning {
 	 *        {(1-\frac{sin(\theta)}{\theta})}^{^7/_6} K_s \sqrt{^\tau/_\gamma}}
 	 *        \right]}^{^6/_{13}} \f]
 	 */
-	private double computeFixedDiameter(double fillAngle) {
+	private double computeFixedDiameter() {
 		final double pow1 = 13.0 / 6;
 		double numerator = Math.pow(4, pow1);
 		final double pow2 = 7.0 / 6;
@@ -183,8 +196,10 @@ public class SewerPipeDimensioning {
 	 *        Computation of the hydraulic radius from \f[ R_h =
 	 *        D\frac{1-sin(\theta)/\theta)}{4} \f] where the \f$ \theta \f$ is
 	 *        the fill angle.
+	 * 
+	 * @param [in] diameter Diameter of the pipe.
 	 */
-	private double computeHydraulicRadius(double fillAngle) {
+	private double computeHydraulicRadius(double diameter) {
 		return diameter / 4 * (1 - Math.sin(fillAngle) / fillAngle);
 	}
 
@@ -212,14 +227,11 @@ public class SewerPipeDimensioning {
 	 *        \f$ K_s \f$ the Gauckler Strickler coefficient and \f$ i_f \f$ the
 	 *        fixed slope. The factor \f$ 10^{-^9/_8} \f$ is a unit transform
 	 *        coefficient. The value returned is in meters.
-	 * 
-	 * @todo Check on the shear stress minimum.
 	 *
 	 * @param[in] slope Slope of the pipe to compute the relative diameter fixed
 	 *            the class fields.
 	 */
 	private double computeDiameter(double slope) {
-		double fillAngle = computeFillAngle();
 		final double pow1 = 3.0 / 8;
 		double numerator = Math.pow((discharge * fillAngle)
 				/ (gaucklerStricklerCoefficient * Math.pow(slope, 0.5)), pow1);
@@ -278,9 +290,17 @@ public class SewerPipeDimensioning {
 	 */
 	public Pipe run(final Pipe pipe) {
 		setPipe(pipe);
-		if (pipeSlope >= minSlope) {
-			this.pipe.buildPipe(elevationEndPoint, computeDiameter(pipeSlope),
-					fillCoefficient, computeVelocity());
+
+		if (pipeSlope > minSlope) {
+			diameter = computeDiameter(pipeSlope);
+			minSlope = computeMinSlope();
+			if (pipeSlope >= minSlope) {
+				this.pipe.buildPipe(elevationEndPoint, diameter,
+						fillCoefficient, computeVelocity());
+			} else {
+				this.pipe.buildPipe(computeElevationEndPoint(minSlope),
+						diameter, fillCoefficient, computeVelocity());
+			}
 		} else {
 			this.pipe.buildPipe(computeElevationEndPoint(minSlope), diameter,
 					fillCoefficient, computeVelocity());
